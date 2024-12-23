@@ -1,6 +1,10 @@
+# Unit test
+/tests
+
 # Test
 *.txt
 *.key
+*.encrypted
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

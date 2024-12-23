@@ -1,3 +1,5 @@
+import os
+
 from cryptography.fernet import Fernet
 
 
@@ -11,3 +13,10 @@ def generate_key():
 # Charger la clé de chiffrement depuis un fichier
 def load_key():
     return open("secret.key", "rb").read()
+
+
+# Générer la clé si elle n'existe pas
+if not os.path.exists("secret.key"):
+    generate_key()
+
+key = load_key()

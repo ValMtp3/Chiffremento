@@ -1,32 +1,39 @@
+import argparse
 import os
 
 from file_crypto import encrypt_file, decrypt_file
-from key_manager import generate_key, load_key
+from key_manager import key
 
 
-# Fonction pour demander le nom du fichier
-def get_file_name():
-    return input("Entrez le nom du fichier : ")
+def validate_file(file_path):
+    """Vérifie si le fichier existe."""
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Erreur : Le fichier '{file_path}' n'existe pas.")
+    return True
 
 
-# Fonction pour demander l'action à effectuer
-def get_action():
-    return input("Voulez-vous chiffrer ou déchiffrer le fichier ? (c/d) : ")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Chiffrement et déchiffrement de fichiers")
+    parser.add_argument("file", help="Chemin du fichier à chiffrer ou à déchiffrer")
+    parser.add_argument("action", choices=["encrypt", "decrypt"],
+                        help="Action à effectuer : 'encrypt' pour chiffrer, 'decrypt' pour déchiffrer")
+    args = parser.parse_args()
 
+    file_path = args.file
+    action = args.action
 
-# Exemple d'utilisation
-if not os.path.exists("secret.key"):
-    generate_key()
+    try:
+        # Valider que le fichier existe
+        validate_file(file_path)
 
-key = load_key()
-file_path = get_file_name()
-action = get_action()
-
-if action == 'c':
-    encrypt_file(file_path, key)
-    print(f"Le fichier {file_path} a été chiffré.")
-elif action == 'd':
-    decrypt_file(file_path, key)
-    print(f"Le fichier {file_path} a été déchiffré.")
-else:
-    print("Action non reconnue.")
+        # Exécuter l'action spécifiée
+        if action == "encrypt":
+            encrypt_file(file_path, key)
+            print(f"Le fichier {file_path} a été chiffré.")
+        elif action == "decrypt":
+            decrypt_file(file_path, key)
+            print(f"Le fichier {file_path} a été déchiffré.")
+    except FileNotFoundError as e:
+        print(f"Erreur : {e}")
+    except Exception as e:
+        print(f"Une erreur inattendue s'est produite : {e}")
