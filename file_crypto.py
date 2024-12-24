@@ -12,7 +12,7 @@ def encrypt_file(file_path, key):
     with open(file_path, 'rb') as file:
         file_data = file.read()
     encrypted_data = cipher_suite.encrypt(file_data)
-    with open(file_path + '.encrypted', 'wb') as file:
+    with open(file_path + '.enc', 'wb') as file:
         file.write(encrypted_data)
 
 
@@ -22,7 +22,7 @@ def decrypt_file(file_path, key):
     if not os.path.exists(file_path):
         print(f"Erreur : Le fichier {file_path} n'existe pas.")
         return
-    if not file_path.endswith('.encrypted'):
+    if not file_path.endswith('.enc'):
         print(f"Erreur : Le fichier {file_path} n'est pas un fichier chiffré.")
         return
     try:
@@ -32,7 +32,7 @@ def decrypt_file(file_path, key):
     except InvalidToken:
         print(f"Erreur : Échec du déchiffrement. La clé est invalide ou les données sont corrompues.")
         return  # Retourne None pour signaler l'échec
-    original_file_path = file_path.replace('.encrypted', '')
+    original_file_path = file_path.replace('.enc', '')
     with open(original_file_path, 'wb') as file:
         file.write(decrypted_data)
 

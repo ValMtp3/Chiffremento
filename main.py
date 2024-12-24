@@ -17,39 +17,41 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chiffrement et déchiffrement de fichiers")
 
     # Ajout des arguments attendus
-    parser.add_argument("file", help="Chemin du fichier à chiffrer ou à déchiffrer")
+    parser.add_argument("files", nargs="+", help="Chemin des fichiers à chiffrer ou à déchiffrer")
     parser.add_argument("action", choices=["encrypt", "decrypt"],
                         help="Action à effectuer : 'encrypt' pour chiffrer, 'decrypt' pour déchiffrer")
-    parser.add_argument("--delete", action="store_true", help="Supprime le fichier original après l'opération")
+    parser.add_argument("--delete", action="store_true",
+                        help="Supprime le(s) fichier(s)original(aux) après l'opération")
 
     # Analyse des arguments passés en ligne de commande
     args = parser.parse_args()
 
     # Récupération des valeurs des arguments
-    file_path = args.file
+    file_paths = args.file
     action = args.action
 
-    try:
-        # Valider que le fichier existe
-        validate_file(file_path)
+    for file_path in file_paths:
+        try:
+            # Valider que le fichier existe
+            validate_file(file_path)
 
-        # Exécuter l'action spécifiée
-        if action == "encrypt":
-            encrypt_file(file_path, key)
-            print(f"Le fichier {file_path} a été chiffré.")
-        elif action == "decrypt":
-            decrypt_file(file_path, key)
-            print(f"Le fichier {file_path} a été déchiffré.")
+            # Exécuter l'action spécifiée
+            if action == "encrypt":
+                encrypt_file(file_path, key)
+                print(f"Le fichier {file_path} a été chiffré.")
+            elif action == "decrypt":
+                decrypt_file(file_path, key)
+                print(f"Le fichier {file_path} a été déchiffré.")
 
-        # Supprimer le fichier original si l'option --del est spécifiée
-        if args.delete:
-            overwrite_file(file_path)
-            os.remove(file_path)
-            print(f"Le fichier original {file_path} a été supprimé.")
+            # Supprimer le fichier original si l'option --del est spécifiée
+            if args.delete:
+                overwrite_file(file_path)
+                os.remove(file_path)
+                print(f"Le fichier original {file_path} a été supprimé.")
 
-    except FileNotFoundError as e:
-        # Gérer l'erreur si le fichier n'existe pas
-        print(f"Erreur : {e}")
-    except Exception as e:
-        # Gérer toute autre erreur inattendue
-        print(f"Une erreur inattendue s'est produite : {e}")
+        except FileNotFoundError as e:
+            # Gérer l'erreur si le fichier n'existe pas
+            print(f"Erreur : {e}")
+        except Exception as e:
+            # Gérer toute autre erreur inattendue
+            print(f"Une erreur inattendue s'est produite : {e}")
