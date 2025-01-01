@@ -2,6 +2,7 @@
 *.txt
 *.key
 *.enc
+dtest/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -152,3 +153,6 @@ poetry.toml
 
 # LSP config files
 pyrightconfig.json
+
+# DS_Store
+.DS_Store

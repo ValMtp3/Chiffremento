@@ -1,9 +1,10 @@
 import os
-import pytest
 
-from main import validate_file
-from file_crypto import encrypt_file, decrypt_file
+import pytest
 from cryptography.fernet import Fernet
+
+from file_crypto import encrypt_file, decrypt_file
+from main import validate_file
 
 
 @pytest.fixture

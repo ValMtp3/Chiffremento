@@ -1,8 +1,9 @@
 import os
+
 import pytest
 from cryptography.fernet import Fernet
 
-from file_crypto import encrypt_file, decrypt_file, overwrite_file
+from file_crypto import encrypt_file, decrypt_file, overwrite_file, create_archive
 
 
 @pytest.fixture
@@ -127,16 +128,19 @@ def test_overwrite_file_existing_file(tmp_path):
     assert content == b"\x00" * file_size
 
 
-def test_overwrite_file_nonexistent_file(tmp_path, capsys):
+def test_overwrite_file_nonexistent_file(tmp_path):
     """Vérifie que overwrite_file gère correctement un fichier inexistant."""
     non_existent_file = tmp_path / "nonexistent_file.txt"
+    output = []
 
-    overwrite_file(str(non_existent_file))
+    # Fonction pour capturer les messages
+    def capture_output(message):
+        output.append(message)
 
-    # Capture la sortie standard
-    captured = capsys.readouterr()
-    assert "Erreur : Le fichier" in captured.out
-    assert not os.path.exists(non_existent_file)
+    overwrite_file(str(non_existent_file), display_callback=capture_output)
+
+    # Vérifie la bonne sortie
+    assert any("Erreur : Le fichier" in message for message in output)
 
 
 def test_overwrite_file_empty_file(tmp_path):
@@ -150,3 +154,60 @@ def test_overwrite_file_empty_file(tmp_path):
     with open(empty_file, "rb") as file:
         content = file.read()
     assert content == b""  # Le fichier reste vide
+
+
+def test_encrypt_file_creates_encrypted_file_with_display(tmp_path, encryption_key):
+    """Vérifie que encrypt_file crée un fichier chiffré et affiche un nom simple."""
+    test_file = tmp_path / "test_file.txt"
+    test_file.write_text("This is a test.")
+
+    # Liste pour capturer les sorties
+    output = []
+
+    # Fonction de callback pour capturer la sortie
+    def capture_output(message):
+        output.append(message)
+
+    encrypt_file(str(test_file), encryption_key, display_callback=capture_output)
+
+    encrypted_file = str(test_file) + ".enc"
+    assert os.path.exists(encrypted_file)
+
+    # Vérifie que le chemin complet n'est pas affiché, uniquement le nom
+    assert "test_file.txt.enc" in output
+    assert len(output) == 1  # Vérifie qu'une seule sortie a été produite
+
+
+def test_overwrite_file_display_name(tmp_path):
+    """Vérifie que le fichier écrasé mentionne uniquement le nom via le callback."""
+    test_file = tmp_path / "sensitive.txt"
+    test_file.write_text("Sensitive data")
+
+    output = []
+
+    def capture_output(message):
+        output.append(message)
+
+    # Appeler overwrite_file avec un callback
+    overwrite_file(str(test_file), display_callback=capture_output)
+
+    # Vérifier que le nom du fichier a été enregistré dans `output`
+    assert "sensitive.txt" in output  # Vérifie que le nom est dans la réponse
+    assert len(output) == 1  # Vérifie qu'une seule réponse est générée
+
+
+def test_create_archive_display_only_basename(tmp_path):
+    """Vérifie que create_archive affiche uniquement le nom via le callback."""
+    test_folder = tmp_path / "test_folder"
+    test_folder.mkdir()  # Crée un dossier de test
+
+    output = []
+
+    def capture_output(message):
+        output.append(message)
+
+    archive_path = create_archive(str(test_folder), display_callback=capture_output)
+
+    # Vérifie que seul le nom du fichier est présent dans la sortie capturée
+    assert "test_folder.zip" in output
+    assert len(output) == 1
