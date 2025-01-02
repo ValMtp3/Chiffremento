@@ -1,8 +1,7 @@
 # Test
-*.txt
 *.key
 *.enc
-dtest/
+example_test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

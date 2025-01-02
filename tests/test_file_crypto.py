@@ -3,7 +3,7 @@ import os
 import pytest
 from cryptography.fernet import Fernet
 
-from file_crypto import encrypt_file, decrypt_file, overwrite_file, create_archive
+from my_package.file_crypto import encrypt_file, decrypt_file, overwrite_file, create_archive
 
 
 @pytest.fixture
